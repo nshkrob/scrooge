@@ -10,8 +10,8 @@ import AssemblyKeys._
 
 object Scrooge extends Build {
   val libVersion = "3.17.0"
-  val utilVersion = "6.22.2"
-  val finagleVersion = "6.22.0"
+  val utilVersion = "6.23.0"
+  val finagleVersion = "6.24.0"
 
   def util(which: String) = "com.twitter" %% ("util-"+which) % utilVersion
   def finagle(which: String) = "com.twitter" %% ("finagle-"+which) % finagleVersion
@@ -203,7 +203,7 @@ object Scrooge extends Build {
     libraryDependencies ++= Seq(
       "org.apache.thrift" % "libthrift" % "0.8.0" % "provided"
     ),
-    crossScalaVersions += "2.11.2"
+    crossScalaVersions += "2.11.4"
   )
 
   lazy val scroogeRuntime = Project(
@@ -243,7 +243,7 @@ object Scrooge extends Build {
       util("codec"),
       "org.apache.thrift" % "libthrift" % "0.8.0" % "provided"
     ),
-    crossScalaVersions += "2.11.2"
+    crossScalaVersions += "2.11.4"
   ).dependsOn(scroogeCore)
 
   lazy val scroogeSbtPlugin = Project(

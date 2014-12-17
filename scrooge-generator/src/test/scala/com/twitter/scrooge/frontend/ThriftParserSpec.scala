@@ -8,11 +8,37 @@ class ThriftParserSpec extends Spec {
   "ThriftParser" should {
     val parser = new ThriftParser(NullImporter, true)
 
+    val commentTestSources = Seq(
+      "  300  ",
+      "  // go away.\n 300",
+      "  /*\n   * go away.\n   */\n 300",
+      "# hello\n 300",
+      "#\n300",
+      "# \n300",
+      "#    @\n300"
+    )
+
+    def verifyCommentParsing(source: String) =
+      parser.parse(source, parser.rhs) must be(IntLiteral(300))
+
     "comments" in {
-      parser.parse("  300  ", parser.rhs) must be( IntLiteral(300))
-      parser.parse("  // go away.\n 300", parser.rhs) must be( IntLiteral(300))
-      parser.parse("  /*\n   * go away.\n   */\n 300", parser.rhs) must be(IntLiteral(300))
-      parser.parse("# hello\n 300", parser.rhs) must be(IntLiteral(300))
+      commentTestSources.foreach(verifyCommentParsing)
+    }
+
+    "comments with Windows-style carriage return" in {
+      commentTestSources.map(_.replace("\n","\r\n")).foreach(verifyCommentParsing)
+    }
+
+    "comments with parens" in {
+      val source = """
+# (
+struct MyStruct {}
+"""
+      parser.parse(source, parser.document) match {
+        case Document(List(),List(Struct(SimpleID("MyStruct", None), "MyStruct", List(),
+          None, m))) if m.isEmpty =>
+        case x => fail(s"Failed to match $x")
+      }
     }
 
     "double-quoted strings" in {
@@ -95,6 +121,16 @@ const string tyrion = "lannister"
 """
       parser.parse(code, parser.definition) must be(ConstDefinition(SimpleID("tyrion"),
         TString, StringLiteral("lannister"), Some("/** comment */\n/** and another */")))
+    }
+
+    "comment before docstring" in {
+      val code = """
+#
+/** docstring */
+const string tyrion = "lannister"
+"""
+      parser.parse(code, parser.definition) must be(ConstDefinition(SimpleID("tyrion"),
+        TString, StringLiteral("lannister"), Some("/** docstring */")))
     }
 
     "typedef" in {
