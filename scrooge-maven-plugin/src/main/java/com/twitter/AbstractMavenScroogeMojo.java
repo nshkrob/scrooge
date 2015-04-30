@@ -188,10 +188,8 @@ abstract class AbstractMavenScroogeMojo extends AbstractMojo {
 
   /**
    * Remote repositories which will be searched for source attachments.
-   * @parameter expression="project.remoteArtifactRepositories"
-   * @required
-   * @readonly
    */
+  @Parameter(defaultValue = "${project.remoteArtifactRepositories}", readonly = true)
   protected List remoteArtifactRepositories;
 
   /**
