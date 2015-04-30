@@ -173,10 +173,6 @@ abstract class AbstractMavenScroogeMojo extends AbstractMojo {
 
   /**
    * The local maven repository.
-   *
-   * @parameter expression="localRepository"
-   * @required
-   * @readonly
    */
   @Parameter(defaultValue = "${localRepository}", readonly = true)
   private ArtifactRepository localRepository;
